@@ -1,10 +1,9 @@
-// src/components/AIHologram.jsx
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Float, useGLTF, Html } from '@react-three/drei';
 
 const Model = () => {
-  const gltf = useGLTF('/models/robot.glb'); // Ensure you have the model in public/models
+  const gltf = useGLTF('/models/robot.glb'); 
   return <primitive object={gltf.scene} scale={2} />;
 };
 
