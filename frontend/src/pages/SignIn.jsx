@@ -1,54 +1,102 @@
 import React, { useContext, useState } from 'react'
 import bg from "../assets/authBg.png"
-import { IoEye } from "react-icons/io5";
-import { IoEyeOff } from "react-icons/io5";
-import { useNavigate } from 'react-router-dom';
-import { userDataContext } from '../context/UserContext';
+import { IoEye, IoEyeOff } from "react-icons/io5"
+import { useNavigate } from 'react-router-dom'
+import { userDataContext } from '../context/UserContext'
 import axios from "axios"
+
 function SignIn() {
-  const [showPassword,setShowPassword]=useState(false)
-  const {serverUrl,userData,setUserData}=useContext(userDataContext)
-  const navigate=useNavigate()
-  const [email,setEmail]=useState("")
-  const [loading,setLoading]=useState(false)
-    const [password,setPassword]=useState("")
-const [err,setErr]=useState("")
-  const handleSignIn=async (e)=>{
+  const [showPassword, setShowPassword] = useState(false)
+  const { serverUrl, setUserData } = useContext(userDataContext)
+  const navigate = useNavigate()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [err, setErr] = useState("")
+
+  const handleSignIn = async (e) => {
     e.preventDefault()
-    setErr("")
     setLoading(true)
-try {
-  let result=await axios.post(`${serverUrl}/api/auth/signin`,{
-   email,password
-  },{withCredentials:true} )
- setUserData(result.data)
-  setLoading(false)
-   navigate("/")
-} catch (error) {
-  console.log(error)
-  setUserData(null)
-  setLoading(false)
-  setErr(error.response.data.message)
-}
+    setErr("")
+
+    try {
+      const res = await axios.post(`${serverUrl}/api/auth/signin`, {
+        email,
+        password
+      }, { withCredentials: true })
+
+      setUserData(res.data)
+      navigate("/")
+    } catch (error) {
+      console.error(error)
+      setUserData(null)
+      setErr(error?.response?.data?.message || "Invalid credentials.")
+    } finally {
+      setLoading(false)
     }
+  }
+
   return (
-    <div className='w-full h-[100vh] bg-cover flex justify-center items-center' style={{backgroundImage:`url(${bg})`}} >
- <form className='w-[90%] h-[600px] max-w-[500px] bg-[#00000062] backdrop-blur shadow-lg shadow-black flex flex-col items-center justify-center gap-[20px] px-[20px]' onSubmit={handleSignIn}>
-<h1 className='text-white text-[30px] font-semibold mb-[30px]'>Sign In to <span className='text-blue-400'>Virtual Assistant</span></h1>
+    <div className="w-full min-h-screen flex items-center justify-center bg-cover bg-center px-4" style={{ backgroundImage: `url(${bg})` }}>
+      <form
+        onSubmit={handleSignIn}
+        className="w-full max-w-[450px] bg-[#0d0d0dad] backdrop-blur-md rounded-2xl shadow-[0_0_50px_#00000088] p-8 text-white flex flex-col gap-6"
+      >
+        <h1 className="text-[28px] font-bold text-center mb-4">
+          Welcome back to <span className="text-blue-500">Virtual Assistant</span>
+        </h1>
 
-<input type="email" placeholder='Email' className='w-full h-[60px] outline-none border-2 border-white bg-transparent  text-white placeholder-gray-300 px-[20px] py-[10px] rounded-full text-[18px]' required onChange={(e)=>setEmail(e.target.value)} value={email}/>
-<div className='w-full h-[60px] border-2 border-white bg-transparent  text-white rounded-full text-[18px] relative'>
-<input type={showPassword?"text":"password"} placeholder='password' className='w-full h-full rounded-full outline-none bg-transparent placeholder-gray-300 px-[20px] py-[10px]' required onChange={(e)=>setPassword(e.target.value)} value={password}/>
-{!showPassword && <IoEye className='absolute top-[18px] right-[20px] w-[25px] h-[25px] text-[white] cursor-pointer' onClick={()=>setShowPassword(true)}/>}
-  {showPassword && <IoEyeOff className='absolute top-[18px] right-[20px] w-[25px] h-[25px] text-[white] cursor-pointer' onClick={()=>setShowPassword(false)}/>}
-</div>
-{err.length>0 && <p className='text-red-500 text-[17px]'>
-  *{err}
-  </p>}
-<button className='min-w-[150px] h-[60px] mt-[30px] text-black font-semibold  bg-white rounded-full text-[19px] ' disabled={loading}>{loading?"Loading...":"Sign In"}</button>
+        <input
+          type="email"
+          placeholder="Email Address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full h-[56px] bg-[#1a1a1a] border border-gray-600 rounded-full px-6 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        />
 
-<p className='text-[white] text-[18px] cursor-pointer' onClick={()=>navigate("/signup")}>Want to create a new account ? <span className='text-blue-400'>Sign Up</span></p>
- </form>
+        <div className="relative w-full h-[56px]">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full h-full bg-[#1a1a1a] border border-gray-600 rounded-full px-6 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          />
+          <div
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-xl text-gray-300 hover:text-blue-500"
+            onClick={() => setShowPassword((prev) => !prev)}
+            title={showPassword ? "Hide Password" : "Show Password"}
+          >
+            {showPassword ? <IoEyeOff /> : <IoEye />}
+          </div>
+        </div>
+
+        {err && (
+          <p className="text-red-500 bg-[#1a1a1a99] px-4 py-2 rounded-md text-sm text-center">
+            ⚠ {err}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="mt-4 w-full h-[56px] bg-blue-500 hover:bg-blue-600 text-black font-semibold rounded-full transition-all duration-300 disabled:opacity-50"
+        >
+          {loading ? "Signing In..." : "Sign In"}
+        </button>
+
+        <p className="text-center text-sm text-gray-400 mt-4">
+          Don't have an account?{" "}
+          <span
+            onClick={() => navigate("/signup")}
+            className="text-blue-400 cursor-pointer hover:underline"
+          >
+            Sign Up
+          </span>
+        </p>
+      </form>
     </div>
   )
 }
