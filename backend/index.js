@@ -10,6 +10,7 @@ import geminiResponse from "./gemini.js"
 
 
 const allowedOrigins = [
+    "https://ai-assistant-uuve.onrender.com",
     "https://ai-assistant673.vercel.app",
     "http://localhost:5173"
   ];
